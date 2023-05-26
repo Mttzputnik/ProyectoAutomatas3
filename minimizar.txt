@@ -1,0 +1,96 @@
+from collections import deque
+
+def minimize(self):
+    # Paso 1: Eliminar estados inalcanzables
+    reachable_states = self.get_reachable_states()
+    self.remove_unreachable_states(reachable_states)
+
+    # Paso 2: Inicializar particiones
+    non_final_states = set(self.States) - set(self.FinalStates)
+    partitions = [set(self.FinalStates), non_final_states]
+
+    # Paso 3: Iterar hasta que no haya cambios en las particiones
+    while True:
+        new_partitions = self.partition_states(partitions)
+        if new_partitions == partitions:
+            break
+        partitions = new_partitions
+
+    # Paso 4: Construir nuevo autómata minimizado
+    return self.build_minimized_automaton(partitions)
+
+def get_reachable_states(self):
+    # Utilizar el algoritmo de búsqueda en anchura (BFS) para encontrar los estados alcanzables
+    queue = deque([self.InitialState])
+    reachable = set([self.InitialState])
+
+    while queue:
+        current_state = queue.popleft()
+        for symbol in self.Alphabet:
+            next_state = self.Transitions[current_state].get(symbol)
+            if next_state and next_state not in reachable:
+                reachable.add(next_state)
+                queue.append(next_state)
+
+    return reachable
+
+def remove_unreachable_states(self, reachable_states):
+    # Eliminar estados no alcanzables
+    self.States = [state for state in self.States if state in reachable_states]
+    self.FinalStates = [state for state in self.FinalStates if state in reachable_states]
+    self.Transitions = {state: self.Transitions[state] for state in self.Transitions if state in reachable_states}
+
+def partition_states(self, partitions):
+    new_partitions = []
+
+    for partition in partitions:
+        split_partitions = []
+        for state in partition:
+            found = False
+            for split_partition in split_partitions:
+                representative = next(iter(split_partition))
+                if self.are_equivalent(state, representative, split_partition):
+                    split_partition.add(state)
+                    found = True
+                    break
+            if not found:
+                split_partitions.append(set([state]))
+        new_partitions.extend(split_partitions)
+
+    return new_partitions
+
+def are_equivalent(self, state1, state2, partition):
+    # Verificar si dos estados son equivalentes comparando sus transiciones
+    for symbol in self.Alphabet:
+        next_state1 = self.Transitions[state1].get(symbol)
+        next_state2 = self.Transitions[state2].get(symbol)
+        if next_state1 != next_state2 and next_state1 is not None and next_state2 is not None:
+            for subset in partition:
+                if next_state1 in subset and next_state2 in subset:
+                    return True
+            return False
+    return True
+
+def build_minimized_automaton(self, partitions):
+    # Construir el autómata minimizado con las particiones finales
+    states = []
+    transitions = {}
+    final_states = []
+
+    for partition in partitions:
+        representative = next(iter(partition))
+        states.append(representative)
+        transitions[representative] = {}
+
+        for symbol in self.Alphabet:
+            next_state = self.Transitions[representative].get(symbol)
+            if next_state:
+                for subset in partitions:
+                    if next_state in subset:
+                        transitions[representative][symbol] = next_state
+                        break
+
+        if representative in self.FinalStates:
+            final_states.append(representative)
+
+    return Automaton(states, self.Alphabet, transitions, self.InitialState, final_states, True)
