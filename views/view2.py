@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import filedialog as fd
 from controllers.controller import Controller
 
 class View:
@@ -18,7 +19,7 @@ class View:
             messagebox.showinfo("Resultado", "La cadena '" + input_str + "' no es aceptada por el autómata")
 
     def LoadAutomataFromFile(self):
-        filepath = tk.filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
+        filepath = fd.askopenfilename(filetypes=[("JSON Files", "*.json")])
         if filepath:
             error = self.controller.LoadAutomataFromFile(filepath)
             if error is not None:
@@ -27,7 +28,7 @@ class View:
                 messagebox.showinfo("Información", "Autómata cargado correctamente")
 
     def LoadAutomatonFromInput(self):
-        data = self.input_text.get("1.0", "end-1c")
+        data = self.input_entry2.get()
         if data:
             error = self.controller.LoadAutomataFromString(data)
             if error is not None:
@@ -36,7 +37,7 @@ class View:
                 messagebox.showinfo("Información", "Autómata cargado correctamente")
 
     def SaveAutomataToFile(self):
-        filepath = tk.filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
+        filepath = fd.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
         if filepath:
             error = self.controller.SaveAutomataToFile(filepath)
             if error is not None:
@@ -44,30 +45,57 @@ class View:
             else:
                 messagebox.showinfo("Información", "Autómata guardado correctamente")
 
+    def ConvertToAFD(self):
+        afd = self.controller.ConvertToDFA()
+        if afd is not None:
+            messagebox.showinfo("Información", "Autómata convertido a AFD correctamente")
+        else:
+            messagebox.showerror("Error", "Error al convertir el autómata a AFD")
+
+
     def VisualizeAutomata(self):
-        # Lógica para visualizar el autómata en un lienzo gráfico
+        self.controller.Automata.PrintAutomata() 
         return None
+    
+
 
     def Run(self):
         root = tk.Tk()
         root.title("Verificador de autómatas")
+        root.geometry("400x400")
 
         # Crear los componentes de la interfaz
-        label = tk.Label(root, text="Ingrese una cadena para verificar:")
-        self.input_entry = tk.Entry(root)
-        verify_button = tk.Button(root, text="Verificar", command=self.VerifyString)
-        load_file_button = tk.Button(root, text="Cargar autómata desde archivo", command=self.LoadAutomataFromFile)
+        labelHome = tk.Label(root, text="¿Qué desea hacer?")
+        
+        load_file_button = tk.Button(root, text="Cargar autómata desde archivo", command=self.LoadAutomataFromFile, )
+        
+
         load_input_button = tk.Button(root, text="Cargar autómata desde entrada manual", command=self.LoadAutomatonFromInput)
+        self.input_entry2 = tk.Entry(root)
+        labelString = tk.Label(root, text="Ingrese una cadena para verificar:")
+        self.input_entry = tk.Entry(root, width = 50)
+        verify_button = tk.Button(root, text="Verificar", command=self.VerifyString)
         save_file_button = tk.Button(root, text="Guardar autómata en archivo", command=self.SaveAutomataToFile)
         visualize_button = tk.Button(root, text="Visualizar autómata", command=self.VisualizeAutomata)
+        convert_button = tk.Button(root, text="Convertir a AFD", command=self.ConvertToAFD)
+        
 
         # Colocar los componentes en la ventana
-        label.pack()
-        self.input_entry.pack()
-        verify_button.pack()
-        load_file_button.pack()
-        load_input_button.pack()
-        save_file_button.pack()
-        visualize_button.pack()
+        labelHome.pack(padx=10, pady=5)
+
+        load_file_button.pack(padx=25, pady=5)
+
+        self.input_entry2.pack(padx=25, pady=5)
+        load_input_button.pack(padx=25, pady=5)
+        
+
+        labelString.pack(padx=25, pady=5)
+        self.input_entry.pack(padx=25, pady=5)
+        verify_button.pack(padx=25, pady=5)
+        
+        
+        save_file_button.pack(padx=25, pady=10)
+        visualize_button.pack(padx=25, pady=10)
+        convert_button.pack(padx=25, pady=10)
 
         root.mainloop()

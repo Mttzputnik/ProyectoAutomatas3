@@ -1,0 +1,75 @@
+class Automata:
+    # ...
+
+    def ConvertToDFA(self):
+        dfa_states = []
+        dfa_transitions = {}
+        dfa_initial_state = ""
+        dfa_final_states = []
+        dfa_alphabet = self.Alphabet
+
+        # Obtener el cierre-épsilon del estado inicial
+        initial_closure = self.EpsilonClosure([self.InitialState])
+
+        # Crear el estado inicial del AFD
+        dfa_initial_state = tuple(sorted(initial_closure))
+        dfa_states.append(dfa_initial_state)
+
+        # Crear una cola para procesar los nuevos estados del AFD
+        queue = [dfa_initial_state]
+
+        while queue:
+            current_state = queue.pop(0)
+
+            for symbol in self.Alphabet:
+                new_state = self.EpsilonClosure(self.GetNextStates(current_state, symbol))
+
+                if new_state not in dfa_states:
+                    dfa_states.append(new_state)
+                    queue.append(new_state)
+
+                dfa_transitions[current_state] = dfa_transitions.get(current_state, {})
+                dfa_transitions[current_state][symbol] = tuple(sorted(new_state))
+
+        # Determinar los estados finales del AFD
+        for state in dfa_states:
+            for final_state in self.FinalStates:
+                if final_state in state:
+                    dfa_final_states.append(state)
+                    break
+
+        # Crear el nuevo AFD
+        dfa = Automata(
+            states=dfa_states,
+            alphabet=dfa_alphabet,
+            transitions=dfa_transitions,
+            initial_state=dfa_initial_state,
+            final_states=dfa_final_states,
+            is_complete=True
+        )
+
+        return dfa
+
+    def EpsilonClosure(self, states):
+        closure = set(states)
+
+        queue = list(states)
+        while queue:
+            current_state = queue.pop(0)
+            if "" in self.Transitions[current_state]:
+                epsilon_states = self.Transitions[current_state][""]
+                for state in epsilon_states:
+                    if state not in closure:
+                        closure.add(state)
+                        queue.append(state)
+
+        return closure
+
+    def GetNextStates(self, states, symbol):
+        next_states = set()
+
+        for state in states:
+            if symbol in self.Transitions[state]:
+                next_states.update(self.Transitions[state][symbol])
+
+        return next_states

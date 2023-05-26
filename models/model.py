@@ -47,3 +47,5 @@ class Automata:
         print("Estado inicial:", self.InitialState)
         print("Estados finales:", self.FinalStates)
         print("Completo:", self.isComplete)
+
+    
