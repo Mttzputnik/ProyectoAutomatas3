@@ -92,19 +92,18 @@ class Controller:
 
 
     def ConvertToDFA(self):
-        dfa_states = [] 
+        dfa_states = set()
         dfa_alphabet = self.Automata.Alphabet
         dfa_transitions = {}
         dfa_initial_state = ""
-        dfa_final_states = []
-       
+        dfa_final_states = set()
 
         # Obtener el cierre-épsilon del estado inicial
         initial_closure = self.EpsilonClosure([self.Automata.InitialState])
 
         # Crear el estado inicial del AFD
         dfa_initial_state = ",".join(sorted(initial_closure))
-        dfa_states.append(dfa_initial_state)
+        dfa_states.add(dfa_initial_state)
 
         # Crear una cola para procesar los nuevos estados del AFD
         queue = [dfa_initial_state]
@@ -120,7 +119,7 @@ class Controller:
                     new_state_str = ",".join(sorted(new_state))
 
                     if new_state_str not in dfa_states:
-                        dfa_states.append(new_state_str)
+                        dfa_states.add(new_state_str)
                         queue.append(new_state_str)
 
                     dfa_transitions[tuple(current_state)] = dfa_transitions.get(
@@ -131,23 +130,27 @@ class Controller:
         for state in dfa_states:
             for final_state in self.Automata.FinalStates:
                 if final_state in state.split(","):
-                    dfa_final_states.append(state)
-                    break
+                    dfa_final_states.add(state)
+
+        # Verificar si el estado inicial es final
+        if self.Automata.InitialState in self.Automata.FinalStates:
+            dfa_final_states.add(dfa_initial_state)
 
         # Crear el nuevo AFD
-        
         dfa = Automata(
-            states=dfa_states,
+            states=list(dfa_states),
             alphabet=dfa_alphabet,
             transitions=dfa_transitions,
             initial_state=dfa_initial_state,
-            final_states=dfa_final_states,
+            final_states=list(dfa_final_states),
             is_complete=True
         )
-        
+
         dfa.PrintAutomata()
-        
+
         return dfa
+
+
 
     def EpsilonClosure(self, states):
         closure = set(states)
