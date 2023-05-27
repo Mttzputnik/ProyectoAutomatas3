@@ -62,17 +62,15 @@ class View:
     def Run(self):
         root = tk.Tk()
         root.title("Verificador de autómatas")
-        root.geometry("400x400")
+        root.geometry("400x450")
 
         # Crear los componentes de la interfaz
-        labelHome = tk.Label(root, text="¿Qué desea hacer?")
-        
+        label_home = tk.Label(root, text="¿Qué desea hacer?")
         load_file_button = tk.Button(root, text="Cargar autómata desde archivo", command=self.LoadAutomataFromFile, )
-        
-
+        label_automata = tk.Label(root, text="Ingrese una Automata manualmente:")
         load_input_button = tk.Button(root, text="Cargar autómata desde entrada manual", command=self.LoadAutomatonFromInput)
-        self.input_entry2 = tk.Entry(root)
-        labelString = tk.Label(root, text="Ingrese una cadena para verificar:")
+        self.input_entry2 = tk.Entry(root, width = 50)
+        label_string= tk.Label(root, text="Ingrese una cadena para verificar:")
         self.input_entry = tk.Entry(root, width = 50)
         verify_button = tk.Button(root, text="Verificar", command=self.VerifyString)
         save_file_button = tk.Button(root, text="Guardar autómata en archivo", command=self.SaveAutomataToFile)
@@ -81,15 +79,16 @@ class View:
         
 
         # Colocar los componentes en la ventana
-        labelHome.pack(padx=10, pady=5)
+        label_home.pack(padx=10, pady=5)
 
-        load_file_button.pack(padx=25, pady=5)
+        load_file_button.pack(padx=25, pady=20)
 
+        label_automata.pack(padx=10, pady=5)
         self.input_entry2.pack(padx=25, pady=5)
         load_input_button.pack(padx=25, pady=5)
         
 
-        labelString.pack(padx=25, pady=5)
+        label_string.pack(padx=25, pady=5)
         self.input_entry.pack(padx=25, pady=5)
         verify_button.pack(padx=25, pady=5)
         
