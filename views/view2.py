@@ -54,7 +54,7 @@ class View:
 
 
     def VisualizeAutomata(self):
-        self.controller.Automata.PrintAutomata() 
+        self.controller.VisualizeAutomata()
         return None
     
 
